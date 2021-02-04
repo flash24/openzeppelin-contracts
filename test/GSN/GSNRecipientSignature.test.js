@@ -1,18 +1,15 @@
+const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
+
 const { expectEvent, expectRevert, constants } = require('@openzeppelin/test-helpers');
 const gsn = require('@openzeppelin/gsn-helpers');
 const { fixSignature } = require('../helpers/sign');
-const { setGSNProvider } = require('../helpers/set-gsn-provider');
 const { utils: { toBN } } = require('web3');
 const { ZERO_ADDRESS } = constants;
 
-const GSNRecipientSignatureMock = artifacts.require('GSNRecipientSignatureMock');
+const GSNRecipientSignatureMock = contract.fromArtifact('GSNRecipientSignatureMock');
 
-contract('GSNRecipientSignature', function (accounts) {
+describe('GSNRecipientSignature', function () {
   const [ signer, other ] = accounts;
-
-  before(function () {
-    setGSNProvider(GSNRecipientSignatureMock, accounts);
-  });
 
   beforeEach(async function () {
     this.recipient = await GSNRecipientSignatureMock.new(signer);
@@ -29,9 +26,9 @@ contract('GSNRecipientSignature', function (accounts) {
     it('fails when constructor called with a zero address', async function () {
       await expectRevert(
         GSNRecipientSignatureMock.new(
-          ZERO_ADDRESS,
+          ZERO_ADDRESS
         ),
-        'GSNRecipientSignature: trusted signer is the zero address',
+        'GSNRecipientSignature: trusted signer is the zero address'
       );
     });
   });
@@ -52,9 +49,9 @@ contract('GSNRecipientSignature', function (accounts) {
             web3.utils.soliditySha3(
               // the nonce is not signed
               // eslint-disable-next-line max-len
-              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas),
-            ), signer,
-          ),
+              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas)
+            ), signer
+          )
         );
 
       await gsn.expectError(this.recipient.mockFunction({ value: 0, useGSN: true, approveFunction }));
@@ -66,9 +63,9 @@ contract('GSNRecipientSignature', function (accounts) {
           await web3.eth.sign(
             web3.utils.soliditySha3(
               // eslint-disable-next-line max-len
-              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas), toBN(data.nonce), data.relayHubAddress, data.to,
-            ), signer,
-          ),
+              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas), toBN(data.nonce), data.relayHubAddress, data.to
+            ), signer
+          )
         );
 
       const { tx } = await this.recipient.mockFunction({ value: 0, useGSN: true, approveFunction });
@@ -82,9 +79,9 @@ contract('GSNRecipientSignature', function (accounts) {
           await web3.eth.sign(
             web3.utils.soliditySha3(
               // eslint-disable-next-line max-len
-              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas), toBN(data.nonce), data.relayHubAddress, data.to,
-            ), other,
-          ),
+              data.relayerAddress, data.from, data.encodedFunctionCall, toBN(data.txFee), toBN(data.gasPrice), toBN(data.gas), toBN(data.nonce), data.relayHubAddress, data.to
+            ), other
+          )
         );
 
       await gsn.expectError(this.recipient.mockFunction({ value: 0, useGSN: true, approveFunction }));

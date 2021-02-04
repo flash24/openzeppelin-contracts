@@ -1,22 +1,11 @@
-// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
 
-pragma solidity ^0.8.0;
-
-import "../token/ERC20/ERC20Snapshot.sol";
+import "../drafts/ERC20Snapshot.sol";
 
 
 contract ERC20SnapshotMock is ERC20Snapshot {
-    constructor(
-        string memory name,
-        string memory symbol,
-        address initialAccount,
-        uint256 initialBalance
-    ) ERC20(name, symbol) {
+    constructor(address initialAccount, uint256 initialBalance) public {
         _mint(initialAccount, initialBalance);
-    }
-
-    function snapshot() public {
-        _snapshot();
     }
 
     function mint(address account, uint256 amount) public {

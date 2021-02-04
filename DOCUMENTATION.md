@@ -10,7 +10,7 @@ program that extracts the API Reference from source code.
 
 The [`docs.openzeppelin.com`](https://github.com/OpenZeppelin/docs.openzeppelin.com)
 repository hosts the configuration for the entire site, which includes
-documentation for all of the OpenZeppelin projects.
+documetation for all of the OpenZeppelin projects.
 
-To run the docs locally you should run `npm run docs:watch` on this
+To run the docs locally you should run `npm run docs start` on this
 repository.

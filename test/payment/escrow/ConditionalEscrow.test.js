@@ -1,9 +1,11 @@
+const { accounts, contract } = require('@openzeppelin/test-environment');
+
 const { ether, expectRevert } = require('@openzeppelin/test-helpers');
 const { shouldBehaveLikeEscrow } = require('./Escrow.behavior');
 
-const ConditionalEscrowMock = artifacts.require('ConditionalEscrowMock');
+const ConditionalEscrowMock = contract.fromArtifact('ConditionalEscrowMock');
 
-contract('ConditionalEscrow', function (accounts) {
+describe('ConditionalEscrow', function () {
   const [ owner, payee, ...otherAccounts ] = accounts;
 
   beforeEach(async function () {
@@ -29,7 +31,7 @@ contract('ConditionalEscrow', function (accounts) {
       await this.escrow.deposit(payee, { from: owner, value: amount });
 
       await expectRevert(this.escrow.withdraw(payee, { from: owner }),
-        'ConditionalEscrow: payee is not allowed to withdraw',
+        'ConditionalEscrow: payee is not allowed to withdraw'
       );
     });
   });

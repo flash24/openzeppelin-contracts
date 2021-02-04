@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
 
-pragma solidity ^0.8.0;
-
-import "../utils/Context.sol";
+import "../GSN/Context.sol";
 contract ReentrancyAttack is Context {
     function callSender(bytes4 data) public {
         // solhint-disable-next-line avoid-low-level-calls

@@ -1,14 +1,14 @@
-// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
 
-pragma solidity ^0.8.0;
+import "../lifecycle/Pausable.sol";
+import "./PauserRoleMock.sol";
 
-import "../utils/Pausable.sol";
-
-contract PausableMock is Pausable {
+// mock class using Pausable
+contract PausableMock is Pausable, PauserRoleMock {
     bool public drasticMeasureTaken;
     uint256 public count;
 
-    constructor () {
+    constructor () public {
         drasticMeasureTaken = false;
         count = 0;
     }
@@ -19,13 +19,5 @@ contract PausableMock is Pausable {
 
     function drasticMeasure() external whenPaused {
         drasticMeasureTaken = true;
-    }
-
-    function pause() external {
-        _pause();
-    }
-
-    function unpause() external {
-        _unpause();
     }
 }

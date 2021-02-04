@@ -1,11 +1,13 @@
+const { accounts, contract } = require('@openzeppelin/test-environment');
+
 const { expectRevert } = require('@openzeppelin/test-helpers');
 
-const ERC20ReturnFalseMock = artifacts.require('ERC20ReturnFalseMock');
-const ERC20ReturnTrueMock = artifacts.require('ERC20ReturnTrueMock');
-const ERC20NoReturnMock = artifacts.require('ERC20NoReturnMock');
-const SafeERC20Wrapper = artifacts.require('SafeERC20Wrapper');
+const ERC20ReturnFalseMock = contract.fromArtifact('ERC20ReturnFalseMock');
+const ERC20ReturnTrueMock = contract.fromArtifact('ERC20ReturnTrueMock');
+const ERC20NoReturnMock = contract.fromArtifact('ERC20NoReturnMock');
+const SafeERC20Wrapper = contract.fromArtifact('SafeERC20Wrapper');
 
-contract('SafeERC20', function (accounts) {
+describe('SafeERC20', function () {
   const [ hasNoCode ] = accounts;
 
   describe('with address that has no contract code', function () {
@@ -13,7 +15,7 @@ contract('SafeERC20', function (accounts) {
       this.wrapper = await SafeERC20Wrapper.new(hasNoCode);
     });
 
-    shouldRevertOnAllCalls('Address: call to non-contract');
+    shouldRevertOnAllCalls('SafeERC20: call to non-contract');
   });
 
   describe('with token that returns false on all calls', function () {
@@ -95,7 +97,7 @@ function shouldOnlyRevertOnErrors () {
       it('reverts when decreasing the allowance', async function () {
         await expectRevert(
           this.wrapper.decreaseAllowance(10),
-          'SafeERC20: decreased allowance below zero',
+          'SafeERC20: decreased allowance below zero'
         );
       });
     });
@@ -108,7 +110,7 @@ function shouldOnlyRevertOnErrors () {
       it('reverts when approving a non-zero allowance', async function () {
         await expectRevert(
           this.wrapper.approve(20),
-          'SafeERC20: approve from non-zero to non-zero allowance',
+          'SafeERC20: approve from non-zero to non-zero allowance'
         );
       });
 
@@ -127,7 +129,7 @@ function shouldOnlyRevertOnErrors () {
       it('reverts when decreasing the allowance to a negative value', async function () {
         await expectRevert(
           this.wrapper.decreaseAllowance(200),
-          'SafeERC20: decreased allowance below zero',
+          'SafeERC20: decreased allowance below zero'
         );
       });
     });

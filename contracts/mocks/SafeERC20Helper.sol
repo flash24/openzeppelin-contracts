@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: MIT
+pragma solidity ^0.5.0;
 
-pragma solidity ^0.8.0;
-
-import "../utils/Context.sol";
+import "../GSN/Context.sol";
 import "../token/ERC20/IERC20.sol";
 import "../token/ERC20/SafeERC20.sol";
 
@@ -98,7 +96,7 @@ contract SafeERC20Wrapper is Context {
 
     IERC20 private _token;
 
-    constructor (IERC20 token) {
+    constructor (IERC20 token) public {
         _token = token;
     }
 

@@ -16,10 +16,8 @@ current_version() {
 }
 
 current_release_branch() {
-  v="$(current_version)"            # 3.3.0-rc.0
-  vf="${v%-"$PRERELEASE_SUFFIX".*}" # 3.3.0
-  r="${vf%.*}"                      # 3.3
-  echo "release-$r"
+  v="$(current_version)"
+  echo "release-${v%%-"$PRERELEASE_SUFFIX".*}"
 }
 
 assert_current_branch() {
@@ -96,22 +94,6 @@ elif [[ "$*" == "start minor" ]]; then
 
   # This bumps minor and adds prerelease suffix, commits the changes, and tags the commit
   npm version preminor --preid="$PRERELEASE_SUFFIX"
-
-  # Rename the release branch
-  git branch --move "$(current_release_branch)"
-
-  push_and_publish next
-
-elif [[ "$*" == "start major" ]]; then
-  log "Creating new major pre-release"
-
-  assert_current_branch master
-
-  # Create temporary release branch
-  git checkout -b release-temp
-
-  # This bumps major and adds prerelease suffix, commits the changes, and tags the commit
-  npm version premajor --preid="$PRERELEASE_SUFFIX"
 
   # Rename the release branch
   git branch --move "$(current_release_branch)"

@@ -1,16 +1,13 @@
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.0;
+pragma solidity ^0.5.0;
 
 import "../token/ERC721/ERC721Pausable.sol";
+import "./PauserRoleMock.sol";
 
 /**
  * @title ERC721PausableMock
  * This mock just provides a public mint, burn and exists functions for testing purposes
  */
-contract ERC721PausableMock is ERC721Pausable {
-    constructor (string memory name, string memory symbol) ERC721(name, symbol) { }
-
+contract ERC721PausableMock is ERC721Pausable, PauserRoleMock {
     function mint(address to, uint256 tokenId) public {
         super._mint(to, tokenId);
     }
@@ -21,13 +18,5 @@ contract ERC721PausableMock is ERC721Pausable {
 
     function exists(uint256 tokenId) public view returns (bool) {
         return super._exists(tokenId);
-    }
-
-    function pause() external {
-        _pause();
-    }
-
-    function unpause() external {
-        _unpause();
     }
 }

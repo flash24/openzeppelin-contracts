@@ -1,23 +1,22 @@
+const { accounts, contract } = require('@openzeppelin/test-environment');
+
 const { BN } = require('@openzeppelin/test-helpers');
 
 const { expect } = require('chai');
 
-const ERC721Holder = artifacts.require('ERC721Holder');
-const ERC721Mock = artifacts.require('ERC721Mock');
+const ERC721Holder = contract.fromArtifact('ERC721Holder');
+const ERC721Mintable = contract.fromArtifact('ERC721MintableBurnableImpl');
 
-contract('ERC721Holder', function (accounts) {
-  const [ owner ] = accounts;
-
-  const name = 'Non Fungible Token';
-  const symbol = 'NFT';
+describe('ERC721Holder', function () {
+  const [ creator ] = accounts;
 
   it('receives an ERC721 token', async function () {
-    const token = await ERC721Mock.new(name, symbol);
+    const token = await ERC721Mintable.new({ from: creator });
     const tokenId = new BN(1);
-    await token.mint(owner, tokenId);
+    await token.mint(creator, tokenId, { from: creator });
 
     const receiver = await ERC721Holder.new();
-    await token.safeTransferFrom(owner, receiver.address, tokenId, { from: owner });
+    await token.safeTransferFrom(creator, receiver.address, tokenId, { from: creator });
 
     expect(await token.ownerOf(tokenId)).to.be.equal(receiver.address);
   });

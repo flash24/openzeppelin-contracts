@@ -1,19 +1,17 @@
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.0;
+pragma solidity ^0.5.0;
 
 import "../utils/Arrays.sol";
 
 contract ArraysImpl {
     using Arrays for uint256[];
 
-    uint256[] private _array;
+    uint256[] private array;
 
-    constructor (uint256[] memory array) {
-        _array = array;
+    constructor (uint256[] memory _array) public {
+        array = _array;
     }
 
-    function findUpperBound(uint256 element) external view returns (uint256) {
-        return _array.findUpperBound(element);
+    function findUpperBound(uint256 _element) external view returns (uint256) {
+        return array.findUpperBound(_element);
     }
 }

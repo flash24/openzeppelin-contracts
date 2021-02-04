@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.0;
+pragma solidity ^0.5.0;
 
 import "../token/ERC721/ERC721.sol";
 import "../GSN/GSNRecipient.sol";
@@ -11,20 +9,10 @@ import "../GSN/GSNRecipientSignature.sol";
  * A simple ERC721 mock that has GSN support enabled
  */
 contract ERC721GSNRecipientMock is ERC721, GSNRecipient, GSNRecipientSignature {
-    constructor(string memory name, string memory symbol, address trustedSigner)
-        ERC721(name, symbol)
-        GSNRecipientSignature(trustedSigner)
-    { }
+    constructor(address trustedSigner) public GSNRecipientSignature(trustedSigner) { }
+    // solhint-disable-previous-line no-empty-blocks
 
     function mint(uint256 tokenId) public {
         _mint(_msgSender(), tokenId);
-    }
-
-    function _msgSender() internal view override(Context, GSNRecipient) returns (address) {
-        return GSNRecipient._msgSender();
-    }
-
-    function _msgData() internal view override(Context, GSNRecipient) returns (bytes memory) {
-        return GSNRecipient._msgData();
     }
 }

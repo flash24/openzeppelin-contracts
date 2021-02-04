@@ -1,46 +1,116 @@
-const { BN } = require('@openzeppelin/test-helpers');
+const { accounts, contract } = require('@openzeppelin/test-environment');
+const { expectEvent } = require('@openzeppelin/test-helpers');
+const { expect } = require('chai');
 
-const EnumerableBytes32SetMock = artifacts.require('EnumerableBytes32SetMock');
-const EnumerableAddressSetMock = artifacts.require('EnumerableAddressSetMock');
-const EnumerableUintSetMock = artifacts.require('EnumerableUintSetMock');
+const EnumerableSetMock = contract.fromArtifact('EnumerableSetMock');
 
-const { shouldBehaveLikeSet } = require('./EnumerableSet.behavior');
+describe('EnumerableSet', function () {
+  const [ accountA, accountB, accountC ] = accounts;
 
-contract('EnumerableSet', function (accounts) {
-  // Bytes32Set
-  describe('EnumerableBytes32Set', function () {
-    const bytesA = '0xdeadbeef'.padEnd(66, '0');
-    const bytesB = '0x0123456789'.padEnd(66, '0');
-    const bytesC = '0x42424242'.padEnd(66, '0');
-
-    beforeEach(async function () {
-      this.set = await EnumerableBytes32SetMock.new();
-    });
-
-    shouldBehaveLikeSet(bytesA, bytesB, bytesC);
+  beforeEach(async function () {
+    this.set = await EnumerableSetMock.new();
   });
 
-  // AddressSet
-  describe('EnumerableAddressSet', function () {
-    const [accountA, accountB, accountC] = accounts;
+  async function expectMembersMatch (set, members) {
+    await Promise.all(members.map(async account =>
+      expect(await set.contains(account)).to.equal(true)
+    ));
 
-    beforeEach(async function () {
-      this.set = await EnumerableAddressSetMock.new();
-    });
+    expect(await set.enumerate()).to.have.same.members(members);
 
-    shouldBehaveLikeSet(accountA, accountB, accountC);
+    expect(await set.length()).to.bignumber.equal(members.length.toString());
+
+    expect(await Promise.all([...Array(members.length).keys()].map(index =>
+      set.get(index)
+    ))).to.have.same.members(members);
+  }
+
+  it('starts empty', async function () {
+    expect(await this.set.contains(accountA)).to.equal(false);
+
+    await expectMembersMatch(this.set, []);
   });
 
-  // UintSet
-  describe('EnumerableUintSet', function () {
-    const uintA = new BN('1234');
-    const uintB = new BN('5678');
-    const uintC = new BN('9101112');
+  it('adds a value', async function () {
+    const receipt = await this.set.add(accountA);
+    expectEvent(receipt, 'TransactionResult', { result: true });
 
-    beforeEach(async function () {
-      this.set = await EnumerableUintSetMock.new();
-    });
+    await expectMembersMatch(this.set, [accountA]);
+  });
 
-    shouldBehaveLikeSet(uintA, uintB, uintC);
+  it('adds several values', async function () {
+    await this.set.add(accountA);
+    await this.set.add(accountB);
+
+    await expectMembersMatch(this.set, [accountA, accountB]);
+    expect(await this.set.contains(accountC)).to.equal(false);
+  });
+
+  it('returns false when adding elements already in the set', async function () {
+    await this.set.add(accountA);
+
+    const receipt = (await this.set.add(accountA));
+    expectEvent(receipt, 'TransactionResult', { result: false });
+
+    await expectMembersMatch(this.set, [accountA]);
+  });
+
+  it('removes added values', async function () {
+    await this.set.add(accountA);
+
+    const receipt = await this.set.remove(accountA);
+    expectEvent(receipt, 'TransactionResult', { result: true });
+
+    expect(await this.set.contains(accountA)).to.equal(false);
+    await expectMembersMatch(this.set, []);
+  });
+
+  it('returns false when removing elements not in the set', async function () {
+    const receipt = await this.set.remove(accountA);
+    expectEvent(receipt, 'TransactionResult', { result: false });
+
+    expect(await this.set.contains(accountA)).to.equal(false);
+  });
+
+  it('adds and removes multiple values', async function () {
+    // []
+
+    await this.set.add(accountA);
+    await this.set.add(accountC);
+
+    // [A, C]
+
+    await this.set.remove(accountA);
+    await this.set.remove(accountB);
+
+    // [C]
+
+    await this.set.add(accountB);
+
+    // [C, B]
+
+    await this.set.add(accountA);
+    await this.set.remove(accountC);
+
+    // [A, B]
+
+    await this.set.add(accountA);
+    await this.set.add(accountB);
+
+    // [A, B]
+
+    await this.set.add(accountC);
+    await this.set.remove(accountA);
+
+    // [B, C]
+
+    await this.set.add(accountA);
+    await this.set.remove(accountB);
+
+    // [A, C]
+
+    await expectMembersMatch(this.set, [accountA, accountC]);
+
+    expect(await this.set.contains(accountB)).to.equal(false);
   });
 });

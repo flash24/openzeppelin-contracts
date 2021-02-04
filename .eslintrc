@@ -18,8 +18,6 @@
     "contract": false,
     "assert": false,
     "web3": false,
-    "usePlugin": false,
-    "extendEnvironment": false,
   },
   "rules": {
 

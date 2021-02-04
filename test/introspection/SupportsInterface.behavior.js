@@ -27,18 +27,6 @@ const INTERFACES = {
     'symbol()',
     'tokenURI(uint256)',
   ],
-  ERC1155: [
-    'balanceOf(address,uint256)',
-    'balanceOfBatch(address[],uint256[])',
-    'setApprovalForAll(address,bool)',
-    'isApprovedForAll(address,address)',
-    'safeTransferFrom(address,address,uint256,uint256,bytes)',
-    'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)',
-  ],
-  ERC1155Receiver: [
-    'onERC1155Received(address,address,uint256,uint256,bytes)',
-    'onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)',
-  ],
 };
 
 const INTERFACE_IDS = {};
@@ -54,18 +42,18 @@ for (const k of Object.getOwnPropertyNames(INTERFACES)) {
 function shouldSupportInterfaces (interfaces = []) {
   describe('Contract interface', function () {
     beforeEach(function () {
-      this.contractUnderTest = this.mock || this.token || this.holder;
+      this.contractUnderTest = this.mock || this.token;
     });
 
     for (const k of interfaces) {
       const interfaceId = INTERFACE_IDS[k];
       describe(k, function () {
         describe('ERC165\'s supportsInterface(bytes4)', function () {
-          it('uses less than 30k gas [skip-on-coverage]', async function () {
+          it('should use less than 30k gas', async function () {
             expect(await this.contractUnderTest.supportsInterface.estimateGas(interfaceId)).to.be.lte(30000);
           });
 
-          it('claims support', async function () {
+          it('should claim support', async function () {
             expect(await this.contractUnderTest.supportsInterface(interfaceId)).to.equal(true);
           });
         });
@@ -73,7 +61,7 @@ function shouldSupportInterfaces (interfaces = []) {
         for (const fnName of INTERFACES[k]) {
           const fnSig = FN_SIGNATURES[fnName];
           describe(fnName, function () {
-            it('has to be implemented', function () {
+            it('should be implemented', function () {
               expect(this.contractUnderTest.abi.filter(fn => fn.signature === fnSig).length).to.equal(1);
             });
           });
